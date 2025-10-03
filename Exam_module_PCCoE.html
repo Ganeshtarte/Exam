@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+<script>
+window.MathJax = {
+  tex: {
+    inlineMath: [['$', '$'], ['\\(', '\\)']],
+    displayMath: [['$$', '$$'], ['\\[', '\\]']]
+  }
+};
+</script>
+<script src="https://polyfill.io/v3/polyfill.min.js?features=es6"></script>
+<script id="MathJax-script" async
+  src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-mml-chtml.js"></script>
+
+  <title>Online Examination</title>
+  <style>
+    body { font-family: Arial; background: #f4f4f4; padding: 20px; }
+    .container { max-width: 1000px;  margin: auto; background: white; padding: 20px; border-radius: 8px; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+    .hidden { display: none; }
+    .question { margin-bottom: 20px; }
+    .options label { display: block; margin-bottom: 12px; padding: 8px 12px; border: 1px solid #ddd; border-radius: 6px; cursor: pointer; transition: background 0.2s ease; }
+    .options label:hover { background: #f9f9f9; }
+    #result { margin-top: 30px; text-align: center; font-size: 20px; color: green; }
+
+    .button-3d {
+      background-color: #4CAF50;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 6px 6px #3e8e41;
+      transition: all 0.2s ease;
+      margin: 5px;
+    }
+    .button-3d:active {
+      background-color: #3e8e41;
+      box-shadow: 0 3px #3e8e41;
+      transform: translateY(3px);
+    }
+    .button1-3d {
+      background-color: #FF0000;
+      color: white;
+      border: none;
+      padding: 12px 24px;
+      font-size: 1rem;
+      border-radius: 8px;
+      cursor: pointer;
+      position: relative;
+      box-shadow: 0 6px 6px #3e8e41;
+      transition: all 0.2s ease;
+      margin: 5px;
+    }
+    .button1-3d:active {
+      background-color: #3e8e41;
+      box-shadow: 0 3px #3e8e41;
+      transform: translateY(3px);
+    }
+.flex-row {
+  display: flex;
+  align-items: flex-start;
+  gap: 20px;
+}
+
+.left {
+  flex: 9; /* Question area takes more space */
+}
+
+.right {
+  flex: 1; /* Panel narrower */
+}
+
+
+ /* Question panel styles */
+    .panel { border:1px solid #e6e6e6; padding:12px; border-radius:8px; background:#fafafa; }
+    .q-grid { display:grid; grid-template-columns: repeat(4, 1fr); gap:8px; }
+    .q-box { border-radius:6px; padding:10px; text-align:center; cursor:pointer; user-select:none; border:1px solid #d0d0d0; background:#eee; font-weight:600; }
+    .q-box:hover { transform: translateY(-1px); transition: 120ms; }
+    .q-box.answered { background: #8fd19e; color:#0b3a10; } /* green */
+    .q-box.seen { background: #ffeb99; color:#5a4600; }     /* yellow */
+    .q-box.current { outline: 3px solid #3b82f6; box-shadow: 0 6px 18px rgba(59,130,246,0.12); }
+    .q-header { display:flex; justify-content:space-between; align-items:center; margin-right:8px; }
+    .marks { font-weight:normal; color:#555; font-size:0.9rem; margin-left:10px; }
+
+    /* responsive */
+    @media (max-width: 960px) {
+      .flex-row { flex-direction: column; }
+      .right { width:100%; }
+      .q-grid { grid-template-columns: repeat(6, 1fr); }
+    }
+
+  </style>
+</head>
+<body>
+  <div class="container">
+
+<!-- Exam Header -->
+<div id="examHeader" style="display:flex; align-items:center; justify-content:center; gap:15px; margin-bottom:20px;">
+  <img src="data:image/jpeg;base64,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" alt="College Logo" style="height:80px;"> 
+  <div style="text-align:center;">
+    <h2 style="margin:0; font-size:12px;">Pimpri Chinchwad Education Trust'S</h2> 
+    <h2 style="margin:0; font-size:22px;">Pimpri Chinchwad College Of Engineering, Pune</h2> 
+    <h3 style="margin:5px 0; font-size:18px; color:#146;">BSH25BA01 - Linear Algebra and Univariate Calculus</h3> 
+    <h3 style="margin:5px 0; font-size:18px; color:#555;">Formatative Assesement-I</h3>  
+  </div>
+</div>
+<hr style="margin-top:10px; margin-bottom:20px;">
+
+<!-- Student Info Page -->
+<div id="studentInfo">
+  <h2>Enter Your Details</h2>
+  <label>PRN No: <input type="text" id="prnNo" required></label><br><br>
+  <label>Name: <input type="text" id="studentName" required></label><br><br>
+  <label>Division:
+    <select id="division" required>
+      <option value="">-- Select Division --</option>
+      <option value="A">A</option>
+      <option value="B">B</option>
+      <option value="C">C</option>
+      <option value="D">D</option>
+      <option value="E">E</option>
+      <option value="F">F</option>
+      <option value="G">G</option>
+      <option value="H">H</option>
+      <option value="I">I</option>
+      <option value="J">J</option>
+      <option value="K">K</option>
+      <option value="L">L</option>
+      <option value="M">M</option>
+      <option value="N">N</option>
+      <option value="O">O</option>
+      <option value="P">P</option>
+    </select>
+  </label><br><br>
+  <label>Password: <input type="password" id="examPassword"></label><br><br>
+  <button class="button-3d" id="startBtn">Start Exam</button>
+</div>
+
+<div id="examPage" class="hidden">
+  <div class="q-header">
+    <div id="studentBar" style="font-weight:bold; color:#0000FF;"></div>
+  </div>
+
+  <div id="timer" style="color:red; font-weight: bold; margin-left:850px; margin-bottom:10px;"></div>
+
+<hr style="margin-top:10px; margin-bottom:20px;">
+
+  <!-- FLEX CONTAINER -->
+  <div class="flex-row">
+    <!-- LEFT: question area -->
+    <div class="left">
+      <form id="examForm"></form>
+
+      <div id="result" style="display:none; margin-top:20px;">
+        <p>Your Score: <span id="totalScore"></span> / <span id="maxMarks"></span></p>
+        <p>Percentage: <span id="percentage"></span>%</p>
+      </div>
+    </div>
+
+    <!-- RIGHT: question panel -->
+    <div class="right">
+      <div class="panel">
+        <h3 style="margin:0 0 10px 0;">Questions Summary</h3>
+        <div id="qGrid" class="q-grid"></div>
+
+        <div style="margin-top:12px; font-size:13px; color:#555;">
+          <div style="display:flex; gap:8px; align-items:center;">
+            <span style="display:inline-block;width:14px;height:14px;background:#eee;border-radius:3px;border:1px solid #d0d0d0;"></span>
+            Not visited
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; margin-top:6px;">
+            <span style="display:inline-block;width:14px;height:14px;background:#ffeb99;border-radius:3px;border:1px solid #d0d0d0;"></span>
+            Seen
+          </div>
+          <div style="display:flex; gap:8px; align-items:center; margin-top:6px;">
+            <span style="display:inline-block;width:14px;height:14px;background:#8fd19e;border-radius:3px;border:1px solid #d0d0d0;"></span>
+            Answered
+          </div>
+        </div>
+      </div>
+    </div>
+  </div> <!-- /flex-row -->
+</div> <!-- /examPage -->
+
+<script>
+  const SHEET_ID = '1fEUCf8K-OhJOfHd5a9wFTYPIV-WPgmFR5_M0oA1Q9WA';
+  const patternURL = `https://opensheet.elk.sh/${SHEET_ID}/Pattern`;
+  const qbURL = `https://opensheet.elk.sh/${SHEET_ID}/QB`;
+  const timeURL = `https://opensheet.elk.sh/${SHEET_ID}/Pattern`;
+  const WEB_APP_URL = "https://script.google.com/macros/s/AKfycbxRD-mbS2HmZcAvdQrkGXetLWZSlHj1VOGNIwdbyFG7ETf6RGyna_p8ksp-b4UjMrLq/exec"; 
+
+  let pattern = [], questionBank = [], selectedQuestions = [];
+  let maxMarks = 0, timeLimit = 0;
+  let student = {};
+  let examInterval;
+  let examPassword = "";
+  let allowedPRN = [];
+  let switchCount = 0;
+  let examActive = false;
+
+  let currentQuestionIndex = 0;
+  let answers = {};
+
+  // Tab switch monitoring
+  function handleTabSwitch() {
+    if (!examActive) return;
+    switchCount++;
+    if (switchCount === 1) {
+      alert("⚠️ Warning: Switching tabs is not allowed. Next time your exam will be auto-submitted.");
+    } else if (switchCount === 2) {
+      alert("❌ You switched again. Your exam will now be submitted.");
+      document.getElementById('submitBtn').click();
+    }
+  }
+  document.addEventListener("visibilitychange", () => { if (document.hidden) handleTabSwitch(); });
+  window.addEventListener("blur", () => { if (document.hidden) handleTabSwitch(); });
+
+  // Start Exam
+  document.getElementById('startBtn').addEventListener('click', async () => {
+    const prn = document.getElementById('prnNo').value.trim();
+    const name = document.getElementById('studentName').value.trim();
+    const division = document.getElementById('division').value.trim();
+    const enteredPass = document.getElementById('examPassword').value.trim();
+
+    if (!prn || !name || !division) {
+      alert("Please fill all fields.");
+      return;
+    }
+
+    student = { prn, name, division };
+    document.getElementById('studentBar').textContent =
+      `Division: ${student.division}  |  PRN: ${student.prn}   |   Name: ${student.name}`;
+
+    try {
+      const check = await fetch(`${WEB_APP_URL}?prn=${prn}`);
+      const result = await check.json();
+
+      if (result.attempted) {
+        alert("You have already attempted the exam. Showing your result.");
+        document.getElementById('startBtn').disabled = true;
+        document.getElementById('startBtn').textContent = "Attempted";
+        showResultDirect(result.record);
+        return;
+      }
+
+      const patternRes = await fetch(patternURL);
+      const patternData = await patternRes.json();
+
+      examPassword = patternData[0]["Password"] ? patternData[0]["Password"].trim() : "";
+      allowedPRN = patternData[0]["AllowedPRN"] ? patternData[0]["AllowedPRN"].split(",").map(m => m.trim()) : [];
+
+      if (examPassword && enteredPass !== examPassword) {
+        alert("❌ Invalid exam password. Please contact to Exam Coordinator");
+        return;
+      }
+      if (allowedPRN.length > 0 && !allowedPRN.includes(prn)) {
+        alert("❌ You are not authorized to take this exam. Contact to Exam Coordinator");
+        return;
+      }
+
+      document.getElementById('studentInfo').classList.add('hidden');
+      document.getElementById('examPage').classList.remove('hidden');
+
+      await fetchData();
+      examActive = true;
+
+    } catch (err) {
+      console.error("Error starting exam:", err);
+      alert("Could not start exam due to network!. Please try after some time.");
+    }
+  });
+
+  async function fetchData() {
+    try {
+      const [patternRes, qbRes, timeRes] = await Promise.all([
+        fetch(patternURL),
+        fetch(qbURL),
+        fetch(timeURL)
+      ]);
+
+      const patternData = await patternRes.json();
+      const qbData = await qbRes.json();
+      const timeData = await timeRes.json();
+
+      timeLimit = parseInt(timeData[0]["Time"], 10) || 1;
+
+      // Normalize pattern and QB: ensure marks/counts are numbers and correct answers are uppercase trimmed
+   pattern = patternData.map(row => ({
+  marks: parseInt(row["Marks"], 10) || 0,
+  count: parseInt(row["No. of questions"], 10) || 0,
+  unit: row["Unit"] ? row["Unit"].toString().trim() : "",
+  topic: row["Topic"] ? row["Topic"].toString().trim() : ""
+}));
+
+questionBank = qbData.map(q => ({
+  marks: parseInt(q["Marks"], 10) || 0,
+  unit: q["Unit"] ? q["Unit"].toString().trim() : "",
+  topic: q["Topic"] ? q["Topic"].toString().trim() : "",
+  question: q["Question"] || "",
+  options: [q["Option A"] || "", q["Option B"] || "", q["Option C"] || "", q["Option D"] || ""],
+  correct: (q["Correct Answer"] || "").toString().trim().toUpperCase()
+}));
+
+
+      generateExam();
+      startTimer(timeLimit);
+
+    } catch (err) { 
+      console.error(err); 
+      alert("Error loading exam data."); 
+    }
+  }
+
+  function generateExam() {
+    selectedQuestions = [];
+    maxMarks = 0;
+
+   pattern.forEach(p => {
+  let pool = questionBank.filter(q => q.marks === p.marks);
+
+  if (p.unit) {
+    pool = pool.filter(q => q.unit === p.unit);
+  }
+  if (p.topic) {
+    pool = pool.filter(q => q.topic === p.topic);
+  }
+
+  const picked = shuffle(pool).slice(0, p.count);
+
+  maxMarks += p.marks * p.count;
+  selectedQuestions.push(...picked);
+});
+
+
+    answers = {};
+    visited = new Array(selectedQuestions.length).fill(false);
+
+    buildQuestionPanel();
+    currentQuestionIndex = 0;
+    showQuestion(currentQuestionIndex);
+  }
+// --- Show question (do NOT mark visited here; we mark when user leaves) ---
+  function showQuestion(index) {
+    const form = document.getElementById('examForm');
+    form.innerHTML = '';
+
+    const q = selectedQuestions[index];
+    const qid = `q${index+1}`;
+
+    form.innerHTML += `
+      <div class="question">
+        <div class="q-header">
+          <span><strong>${index+1}. ${q.question}</strong></span>
+          <span class="marks">(${q.marks} mark${q.marks>1?'s':''})</span>
+        </div>
+</div>
+
+        <div class="options">
+          ${q.options.map((opt,i)=>`
+            <label>
+              <input type="radio" name="${qid}" value="${String.fromCharCode(65+i)}" onchange="answers['${qid}']=this.value"/>
+              ${opt}
+            </label>`).join('')}
+        </div>
+      </div>
+    `;
+
+    let navHTML = `<div style="margin-top:20px;">`;
+    navHTML += `<button type="button" class="button1-3d" id="submitBtn" style="float:right;">Submit</button>`;
+    if (index > 0) navHTML += `<button type="button" class="button-3d" onclick="prevQuestion()">Previous</button>`;
+                   
+    if (index < selectedQuestions.length - 1) {
+      navHTML += `<button type="button" class="button-3d" style="float:right;" onclick="nextQuestion()">Next</button>`;
+    } else {
+
+    }
+    navHTML += `</div>`;
+    form.innerHTML += navHTML;
+
+    restoreAnswer(index);
+    updatePanelStyles();
+    if (window.MathJax) MathJax.typesetPromise();
+  }
+
+  // --- Navigation: when leaving a question mark it as visited (seen) if not answered ---
+  function nextQuestion(){
+    // save current if answered
+    saveAnswer(currentQuestionIndex);
+
+    // mark the ONE we are leaving as seen (only if not answered)
+    if (!answers[`q${currentQuestionIndex+1}`]) visited[currentQuestionIndex] = true;
+
+    if (currentQuestionIndex < selectedQuestions.length - 1) {
+      currentQuestionIndex++;
+      showQuestion(currentQuestionIndex);
+    }
+  }
+  function prevQuestion(){
+    saveAnswer(currentQuestionIndex);
+    // mark leaving question as seen if not answered
+    if (!answers[`q${currentQuestionIndex+1}`]) visited[currentQuestionIndex] = true;
+
+    if (currentQuestionIndex > 0) {
+      currentQuestionIndex--;
+      showQuestion(currentQuestionIndex);
+    }
+  }
+
+  // markAnswer called from radio onchange: make it green immediately and also mark visited for that index
+  function markAnswer(qid, value){
+    answers[qid] = value;
+    const idx = parseInt(qid.replace('q',''),10) - 1;
+    if (!isNaN(idx)) {
+      // answered -> ensure visited true (optional) but answered takes precedence
+      visited[idx] = true;
+    }
+    updatePanelStyles();
+  }
+
+  function saveAnswer(index){
+    const qid = `q${index+1}`;
+    const selected = document.querySelector(`input[name="${qid}"]:checked`);
+    if (selected) {
+      answers[qid] = selected.value;
+    }
+    // If they didn't answer, visited flag may be set by next/prev handlers already.
+    updatePanelStyles();
+  }
+
+  function restoreAnswer(index){
+    const qid = `q${index+1}`;
+    if (answers[qid]) {
+      const val = answers[qid];
+      const input = document.querySelector(`input[name="${qid}"][value="${CSS.escape ? CSS.escape(val) : val}"]`);
+      if (input) input.checked = true;
+    }
+  }
+
+  // build panel and wire click: clicking another box will save current and mark it seen
+  function buildQuestionPanel(){
+    const qGrid = document.getElementById('qGrid');
+    qGrid.innerHTML = '';
+    for (let i = 0; i < selectedQuestions.length; i++) {
+      const box = document.createElement('div');
+      box.className = 'q-box';
+      box.id = 'qbox-' + i;
+      box.textContent = 'Q' + (i+1);
+      box.onclick = () => {
+        // when jumping, save and mark the question we are leaving as seen if not answered
+        saveAnswer(currentQuestionIndex);
+        if (!answers[`q${currentQuestionIndex+1}`]) visited[currentQuestionIndex] = true;
+        currentQuestionIndex = i;
+        showQuestion(i);
+      };
+      qGrid.appendChild(box);
+    }
+    updatePanelStyles();
+  }
+
+  function updatePanelStyles(){
+    for (let i=0;i<selectedQuestions.length;i++){
+      const box = document.getElementById('qbox-' + i);
+      if (!box) continue;
+      const qid = `q${i+1}`;
+      box.classList.remove('answered','seen','current');
+      if (answers[qid]) {
+        box.classList.add('answered');
+      } else if (visited[i]) {
+        box.classList.add('seen');
+      } else {
+        // default grey
+      }
+      if (i === currentQuestionIndex) box.classList.add('current');
+    }
+  }
+
+document.addEventListener('click', function(e){
+    if(e.target && e.target.id === 'submitBtn'){
+      e.preventDefault();
+
+      // SAVE current answer (critical fix: submit must capture the visible selection)
+      saveAnswer(currentQuestionIndex);
+
+      clearInterval(examInterval);
+
+      // Debug/logging: list each Q, given answer and marks
+      console.log("Grading: ");
+      selectedQuestions.forEach((q, index) => {
+        const ans = answers[`q${index+1}`] || "(no answer)";
+        console.log(`Q${index+1}: marks=${q.marks} | correct=${q.correct} | answered=${ans}`);
+      });
+
+      let score = 0;
+      selectedQuestions.forEach((q,index)=>{
+        const ans = answers[`q${index+1}`];
+        if(ans){
+          // ensure comparisons are normalized
+          const normalizedAns = ans.toString().trim().toUpperCase();
+          if(normalizedAns === q.correct) score += q.marks;
+          else score -= q.marks * 0.25;
+        }
+      });
+      if(score<0) score=0;
+
+      showResult(score, maxMarks);
+      saveResult(score);
+    }
+  });
+
+  function shuffle(arr){ return arr.sort(()=>Math.random()-0.5); }
+
+  function startTimer(minutes){
+    let seconds = minutes*60;
+    const timerEl = document.getElementById('timer');
+    examInterval = setInterval(()=>{
+      const min=Math.floor(seconds/60);
+      const sec=seconds%60;
+      timerEl.textContent=`Time Left: ${min}:${sec<10?'0':''}${sec}`;
+      seconds--;
+      // if(seconds===60){ alert("Last 60 sec!"); }
+      if(seconds<0){ clearInterval(examInterval); alert("Time's up!"); document.getElementById('submitBtn').click(); }
+    },1000);
+  }
+
+  function saveResult(score){
+    examActive = false;
+    const data={
+      prn: student.prn,
+      name: student.name,
+      division: student.division,
+      score: score,
+      maxMarks: maxMarks,
+      percentage: ((score/maxMarks)*100).toFixed(2),
+      timestamp: new Date().toLocaleString()
+    };
+    fetch(WEB_APP_URL,{ method:'POST', body:JSON.stringify(data) })
+      .then(res=>res.json()).then(resp=>console.log("Saved!",resp))
+      .catch(err=>console.error("Error saving result",err));
+  }
+
+  function showResult(score, maxMarks){
+    examActive = false;
+    const form = document.getElementById('examForm');
+    form.innerHTML='';
+    document.getElementById('timer').style.display='none';
+    document.getElementById('totalScore').textContent = score;
+    document.getElementById('maxMarks').textContent = maxMarks;
+    const percent = ((score/maxMarks)*100).toFixed(2);
+    const percEl = document.getElementById('percentage');
+    percEl.textContent = percent;
+    percEl.style.color = (percent < 40) ? "red" : "green";
+    document.getElementById('result').style.display='block';
+  }
+
+  function showResultDirect(record){
+    examActive = false;
+    document.getElementById('studentInfo').classList.add('hidden');
+    document.getElementById('examPage').classList.remove('hidden');
+    document.getElementById('examForm').innerHTML='';
+    document.getElementById('timer').style.display='none';
+
+    const score = parseFloat(record.score) || 0;
+    const maxMarks = parseFloat(record.maxMarks) || 0;
+    const percent = parseFloat(record.percentage) || ((score/maxMarks)*100).toFixed(2);
+
+    document.getElementById('totalScore').textContent = score;
+    document.getElementById('maxMarks').textContent = maxMarks;
+    const percEl = document.getElementById('percentage');
+    percEl.textContent = percent;
+    percEl.style.color = (percent < 40) ? "red" : "green";
+    document.getElementById('result').style.display='block';
+  }function escapeHtml(str){
+    if (!str && str !== 0) return '';
+    return String(str).replace(/[&<>"'`=\/]/g, function(s){ return ({
+      '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;','`':'&#x60;','=':'&#x3D;','/':'&#x2F;'
+    })[s]; });
+  }
+
+  // Debug helper: if you want to test without Opensheet, uncomment and call loadTestDataAndStart()
+  /*
+  function loadTestDataAndStart() {
+    selectedQuestions = [
+      { marks: 1, question: "If |A| = 0, then A is called as ...", options:["Zero matrix","Singular matrix","Non singular matrix","Invertible Matrix"], correct: "B" },
+      { marks: 1, question: "Rank of identity is ...", options:["0","1","n","n-1"], correct: "C" },
+      { marks: 2, question: "Determinant triangular equals ...", options:["sum","product","trace","none"], correct: "B" }
+    ];
+    maxMarks = selectedQuestions.reduce((a,b)=>a + (b.marks||0), 0);
+    answers = {}; visited = new Array(selectedQuestions.length).fill(false);
+    buildQuestionPanel();
+    showQuestion(0);
+    startTimer(5);
+    document.getElementById('studentInfoPage').classList.add('hidden');
+    document.getElementById('examPage').classList.remove('hidden');
+    examActive = true;
+  }
+  */
+
+  // expose for inline handlers
+  window.markAnswer = markAnswer;
+  window.nextQuestion = nextQuestion;
+  window.prevQuestion = prevQuestion;
+
+</script>
+</body>
+</html>
