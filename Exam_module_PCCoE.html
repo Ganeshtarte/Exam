@@ -606,5 +606,103 @@ document.addEventListener('click', function(e){
   window.prevQuestion = prevQuestion;
 
 </script>
+<script>
+// === Exam Protection Layer ===
+
+// 1️⃣ Disable right-click
+document.addEventListener('contextmenu', event => event.preventDefault());
+
+// 2️⃣ Disable F12, Ctrl+Shift+I/J/C/U and Inspect shortcuts
+document.onkeydown = function(e) {
+  if (
+    e.keyCode == 123 || // F12
+    (e.ctrlKey && e.shiftKey && ['I','J','C'].includes(e.key.toUpperCase())) ||
+    (e.ctrlKey && e.key.toUpperCase() == 'U')
+  ) {
+    e.preventDefault();
+    return false;
+  }
+};
+// 4️⃣ Disable text selection and copy
+document.addEventListener('copy', e => e.preventDefault());
+document.addEventListener('cut', e => e.preventDefault());
+document.addEventListener('selectstart', e => e.preventDefault());
+
+// 5️⃣ Disable drag/drop or paste
+document.addEventListener('dragstart', e => e.preventDefault());
+document.addEventListener('drop', e => e.preventDefault());
+document.addEventListener('paste', e => e.preventDefault());
+
+// 6️⃣ Fullscreen enforcement
+// Enter fullscreen
+function enterFullScreen() {
+  const el = document.documentElement; // Can also be examContent
+  if (el.requestFullscreen) el.requestFullscreen();
+  else if (el.webkitRequestFullscreen) el.webkitRequestFullscreen();
+  else if (el.mozRequestFullScreen) el.mozRequestFullScreen();
+  else if (el.msRequestFullscreen) el.msRequestFullscreen();
+}
+
+// Detect fullscreen exit
+function monitorFullScreen() {
+  document.addEventListener('fullscreenchange', checkFullScreen);
+  document.addEventListener('webkitfullscreenchange', checkFullScreen);
+  document.addEventListener('mozfullscreenchange', checkFullScreen);
+  document.addEventListener('MSFullscreenChange', checkFullScreen);
+}
+
+function checkFullScreen() {
+  if (!document.fullscreenElement &&
+      !document.webkitFullscreenElement &&
+      !document.mozFullScreenElement &&
+      !document.msFullscreenElement) {
+    alert("⚠️ You exited fullscreen! Your exam will be auto-submitted.");
+    autoSubmitExam();
+  }
+}
+
+// Auto-submit function
+function autoSubmitExam() {
+  // Replace this with your actual exam submit logic
+  console.log("Exam submitted automatically due to fullscreen exit.");
+  document.getElementById('submitBtn').click();
+  // Example: document.getElementById("examForm").submit();
+}
+
+document.getElementById('startBtn').addEventListener('click', () => {
+  enterFullScreen();
+  monitorFullScreen();
+
+  const notif = document.createElement("div");
+  notif.innerText = "📢 Exam started in secure mode. Do not switch tabs or exit fullscreen. Else examination will be auto submitted.";
+  notif.style.position = "fixed";
+  notif.style.center = "15px";
+  notif.style.left = "50%";
+  notif.style.transform = "translateX(-50%)";
+  notif.style.background = "#ffeb3b";
+  notif.style.padding = "10px 20px";
+  notif.style.border = "1px solid #000";
+  notif.style.zIndex = 9999;
+  document.body.appendChild(notif);
+  setTimeout(() => notif.remove(), 15000);
+});
+
+// 7️⃣ Warn before closing tab
+window.onbeforeunload = function() {
+  return "Are you sure you want to leave the exam?";
+};
+
+// 8️⃣ Disable DevTools open detection
+setInterval(function() {
+  const before = performance.now();
+  debugger;
+  const after = performance.now();
+  if (after - before > 100) {
+    alert("⚠️ DevTools detected! Exam terminated.");
+    window.close();
+  }
+}, 2000);
+</script>
+
 </body>
 </html>
